@@ -1,0 +1,52 @@
+# Python virtual environments
+.venv/
+venv/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Django runtime files
+*.log
+db.sqlite3
+staticfiles/
+media/
+
+# Test and coverage output
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Type-checking and linting caches
+.mypy_cache/
+.ruff_cache/
+
+# IDE settings
+.vscode/
+.idea/
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Node
+frontend/node_modules/
+frontend/dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
