@@ -1,0 +1,61 @@
+name: Deploy Inventory System
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy application to EC2
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+          script: |
+            set -e
+
+            echo "=== Starting deployment ==="
+
+            cd /home/ubuntu/inventory-system
+
+            echo "=== Updating source code ==="
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "=== Backend deployment ==="
+            cd backend
+
+            source .venv/bin/activate
+
+            pip install -r requirements/production.txt
+
+            python manage.py migrate --noinput
+
+            python manage.py collectstatic --noinput
+
+            echo "=== Frontend deployment ==="
+            cd ../frontend
+
+            npm ci
+
+            npm run build
+
+            echo "=== Publishing frontend ==="
+            sudo rm -rf /var/www/inventory-system/*
+
+            sudo cp -a dist/. /var/www/inventory-system/
+
+            echo "=== Restarting Gunicorn ==="
+            sudo systemctl restart inventory-gunicorn
+
+            echo "=== Reloading Nginx ==="
+            sudo systemctl reload nginx
+
+            echo "=== Deployment complete ==="
