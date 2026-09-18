@@ -22,6 +22,7 @@ function UserFormDialog({
   roles = [],
   isSubmitting = false,
   error = null,
+  fieldErrors = {},
   onSubmit,
   onCancel,
 }) {
@@ -353,6 +354,16 @@ function UserFormDialog({
                       ? ""
                       : "Leave blank to keep current password"
                   }
+                  aria-invalid={
+                    Boolean(
+                      fieldErrors.password?.length,
+                    )
+                  }
+                  aria-describedby={
+                    fieldErrors.password?.length
+                      ? "user-password-error"
+                      : undefined
+                  }
                   onChange={
                     (event) =>
                       updateField(
@@ -361,6 +372,16 @@ function UserFormDialog({
                       )
                   }
                 />
+
+                {fieldErrors.password?.length ? (
+                  <span
+                    id="user-password-error"
+                    className="user-form-field-error"
+                    role="alert"
+                  >
+                    {fieldErrors.password[0]}
+                  </span>
+                ) : null}
               </label>
 
               <label className="user-active-field">

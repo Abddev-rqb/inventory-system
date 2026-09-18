@@ -92,6 +92,11 @@ function UserManagementPage() {
   ] = useState(null);
 
   const [
+    formFieldErrors,
+    setFormFieldErrors,
+  ] = useState({});
+
+  const [
     successMessage,
     setSuccessMessage,
   ] = useState(null);
@@ -522,6 +527,10 @@ function UserManagementPage() {
       null,
     );
 
+    setFormFieldErrors(
+      {},
+    );
+
     setDeleteError(
       null,
     );
@@ -574,6 +583,10 @@ function UserManagementPage() {
 
       setFormError(
         parsed.message,
+      );
+
+      setFormFieldErrors(
+        parsed.fields,
       );
     } finally {
       setIsSubmitting(
@@ -783,34 +796,37 @@ function UserManagementPage() {
 
 
       <UserFormDialog
-        isOpen={
-          Boolean(
-            dialogMode,
-          )
-        }
-        mode={
-          dialogMode ||
-          "create"
-        }
-        user={
-          selectedUser
-        }
-        roles={
-          roles
-        }
-        isSubmitting={
-          isSubmitting
-        }
-        error={
-          formError
-        }
-        onSubmit={
-          handleSubmit
-        }
-        onCancel={
-          closeDialog
-        }
-      />
+      isOpen={
+        Boolean(
+          dialogMode,
+        )
+      }
+      mode={
+        dialogMode ||
+        "create"
+      }
+      user={
+        selectedUser
+      }
+      roles={
+        roles
+      }
+      isSubmitting={
+        isSubmitting
+      }
+      error={
+        formError
+      }
+      fieldErrors={
+        formFieldErrors
+      }
+      onSubmit={
+        handleSubmit
+      }
+      onCancel={
+        closeDialog
+      }
+    />
 
 
       <ConfirmDialog

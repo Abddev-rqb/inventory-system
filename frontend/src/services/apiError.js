@@ -187,11 +187,21 @@ function extractErrorMessage(
   responseData,
   fields,
 ) {
+  const errorObject =
+    responseData?.error &&
+    typeof responseData.error ===
+      "object" &&
+    !Array.isArray(
+      responseData.error,
+    )
+      ? responseData.error
+      : responseData;
+
   const directMessage =
-    responseData.message ??
-    responseData.detail ??
-    responseData.error ??
-    responseData.non_field_errors;
+    errorObject?.message ??
+    errorObject?.detail ??
+    errorObject?.error ??
+    errorObject?.non_field_errors;
 
   const normalizedDirectMessage =
     normalizeMessage(
@@ -221,25 +231,43 @@ function extractErrorMessage(
 function extractFieldErrors(
   responseData,
 ) {
-  const fieldSource =
-    responseData.fields &&
-    typeof responseData.fields ===
+  const errorObject =
+    responseData?.error &&
+    typeof responseData.error ===
       "object" &&
     !Array.isArray(
-      responseData.fields,
+      responseData.error,
     )
-      ? responseData.fields
-      : responseData.errors &&
-          typeof responseData.errors ===
+      ? responseData.error
+      : responseData;
+
+  const fieldSource =
+    errorObject?.details &&
+    typeof errorObject.details ===
+      "object" &&
+    !Array.isArray(
+      errorObject.details,
+    )
+      ? errorObject.details
+      : errorObject?.fields &&
+          typeof errorObject.fields ===
             "object" &&
           !Array.isArray(
-            responseData.errors,
+            errorObject.fields,
           )
-        ? responseData.errors
-        : responseData;
+        ? errorObject.fields
+        : errorObject?.errors &&
+            typeof errorObject.errors ===
+              "object" &&
+            !Array.isArray(
+              errorObject.errors,
+            )
+          ? errorObject.errors
+          : errorObject;
 
   const excludedKeys =
     new Set([
+      "success",
       "status",
       "status_code",
       "code",
@@ -249,6 +277,7 @@ function extractFieldErrors(
       "non_field_errors",
       "fields",
       "errors",
+      "details",
     ]);
 
   return Object.fromEntries(

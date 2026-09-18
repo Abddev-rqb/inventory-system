@@ -1,6 +1,7 @@
 from django.contrib.auth import (
     get_user_model,
 )
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.contrib.auth.password_validation import (
     validate_password,
 )
@@ -305,10 +306,17 @@ class UserUpdateSerializer(
             )
 
         if password:
-            validate_password(
-                password,
-                user=instance,
-            )
+            try:
+                validate_password(
+                    password,
+                    user=instance,
+                )
+            except DjangoValidationError as exc:
+                raise serializers.ValidationError(
+                    {
+                        "password": exc.messages,
+                    }
+                )
 
             instance.set_password(
                 password
