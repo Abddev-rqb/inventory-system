@@ -43,8 +43,9 @@ function ApplicationSidebar({
     );
 
   const canViewDispatched =
-    canViewOrders &&
-    !isInventoryViewer;
+  hasPermission(
+    "inventory.view_order",
+  );
 
   const canViewSales =
     !isInventoryViewer &&
