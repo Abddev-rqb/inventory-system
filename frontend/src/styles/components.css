@@ -4786,3 +4786,178 @@ textarea {
     align-items: stretch;
   }
 }
+
+/* =========================================================
+   Laptop Inventory - Comments
+   ========================================================= */
+
+.inventory-comments-column {
+  min-width: 260px;
+  width: 260px;
+}
+
+.inventory-comments-cell {
+  min-width: 260px;
+  max-width: 320px;
+  vertical-align: middle;
+}
+
+.inventory-comment-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.inventory-comment-preview {
+  display: block;
+  min-width: 0;
+  max-width: 230px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inventory-comment-empty {
+  color: #98a2b3;
+}
+
+.inventory-comment-view-button {
+  flex-shrink: 0;
+  padding: 4px 9px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.inventory-comment-view-button:hover {
+  background: #f2f4f7;
+  border-color: #98a2b3;
+}
+
+.inventory-comment-view-button:focus-visible {
+  outline: 2px solid #84adff;
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   Laptop Inventory - Comment Modal
+   ========================================================= */
+
+.inventory-comment-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(16, 24, 40, 0.45);
+}
+
+.inventory-comment-modal {
+  width: min(600px, 100%);
+  max-height: min(500px, 80vh);
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background: #ffffff;
+  border: 1px solid #eaecf0;
+  border-radius: 12px;
+
+  box-shadow:
+    0 20px 40px rgba(16, 24, 40, 0.18),
+    0 4px 12px rgba(16, 24, 40, 0.08);
+}
+
+.inventory-comment-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 18px 20px;
+
+  border-bottom: 1px solid #eaecf0;
+}
+
+.inventory-comment-modal-title {
+  margin: 0;
+
+  color: #101828;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.inventory-comment-modal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  margin-top: 6px;
+
+  color: #667085;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.inventory-comment-modal-close {
+  flex-shrink: 0;
+
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 6px;
+
+  background: transparent;
+  color: #667085;
+
+  font-size: 24px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.inventory-comment-modal-close:hover {
+  background: #f2f4f7;
+  color: #344054;
+}
+
+.inventory-comment-modal-close:focus-visible {
+  outline: 2px solid #84adff;
+  outline-offset: 2px;
+}
+
+.inventory-comment-modal-body {
+  overflow-y: auto;
+
+  padding: 20px;
+
+  color: #344054;
+  font-size: 14px;
+  line-height: 1.6;
+
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

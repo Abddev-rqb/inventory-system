@@ -18,6 +18,7 @@ from apps.inventory.models import (
     OrderItem,
 )
 from apps.inventory.roles import (
+    ROLE_INVENTORY_VIEWER,
     ROLE_SALES,
     ROLE_TECHNICIAN,
     get_user_role,
@@ -320,21 +321,21 @@ class LaptopSerializer(
         instance = self.instance
 
         # ---------------------------------------------
-        # Sales users can edit laptop information,
-        # but prices are Admin-controlled.
+        # Inventory Viewer users are read-only.
         #
-        # If a Sales user sends price fields during
-        # PATCH/PUT, remove them from validated data.
+        # If an Inventory Viewer somehow sends price
+        # fields during PATCH/PUT, remove them from
+        # validated data as a backend safety check.
         #
-        # This means the existing database prices
-        # remain completely unchanged.
+        # Admin and Sales users are allowed to change
+        # both wholesale and retail prices.
         # ---------------------------------------------
         if (
             request is not None
             and instance is not None
             and get_user_role(
                 request.user
-            ) == ROLE_SALES
+            ) == ROLE_INVENTORY_VIEWER
         ):
             attributes.pop(
                 "wholesale_price",

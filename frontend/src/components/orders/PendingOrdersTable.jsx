@@ -112,6 +112,10 @@ function PendingOrdersTable({
             </th>
 
             <th scope="col">
+              Serial numbers
+            </th>
+
+            <th scope="col">
               Total items
             </th>
 
@@ -239,6 +243,11 @@ function PendingOrdersTable({
                     />
                   </td>
 
+                  <td>
+                    <SerialNumbers
+                      items={order.items}
+                    />
+                  </td>
 
                   <td>
                     {displayValue(
@@ -341,6 +350,52 @@ function PendingOrdersTable({
   );
 }
 
+function SerialNumbers({
+  items,
+}) {
+  if (
+    !Array.isArray(items)
+  ) {
+    return "—";
+  }
+
+  const serialNumbers =
+    items
+      .filter(
+        (item) =>
+          !item.is_custom_item &&
+          item.serial_number_snapshot,
+      )
+      .map(
+        (item) =>
+          item.serial_number_snapshot,
+      );
+
+  if (
+    serialNumbers.length === 0
+  ) {
+    return "—";
+  }
+
+  return (
+    <div className="pending-order-items">
+      {serialNumbers.map(
+        (
+          serialNumber,
+          index,
+        ) => (
+          <span
+            key={
+              `${serialNumber}-${index}`
+            }
+          >
+            {serialNumber}
+          </span>
+        ),
+      )}
+    </div>
+  );
+}
 
 function OrderItemsCell({
   items,

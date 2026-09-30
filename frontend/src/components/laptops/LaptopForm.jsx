@@ -438,7 +438,7 @@ function LaptopForm({
           htmlFor="wholesale_price"
           hint={
             lockPrices
-              ? "View only. Only Admin users can change this price."
+              ? "View only. Admin and Sales users can change this price."
               : "Amount in Indian rupees."
           }
           error={
@@ -490,7 +490,7 @@ function LaptopForm({
           htmlFor="retail_price"
           hint={
             lockPrices
-              ? "View only. Only Admin users can change this price."
+              ? "View only. Admin and Sales users can change this price."
               : "Amount in Indian rupees."
           }
           error={

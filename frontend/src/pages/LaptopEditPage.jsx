@@ -70,9 +70,15 @@ function LaptopEditPage() {
   ] = useState({});
 
 
-  const isSales =
+  /*
+   * Inventory Viewer is read-only.
+   *
+   * Admin and Sales users can edit
+   * both wholesale and retail prices.
+   */
+  const isInventoryViewer =
     user?.role ===
-    "sales";
+    "inventory_viewer";
 
   const isValidLaptopId =
     isPositiveInteger(
@@ -181,26 +187,18 @@ function LaptopEditPage() {
         );
 
       /*
-       * Sales can edit normal inventory
-       * information, but both prices are
-       * controlled by Admin.
+       * Admin and Sales users are allowed
+       * to update both wholesale and retail
+       * prices.
        *
-       * Prices are therefore completely
-       * removed from the PATCH payload.
+       * Inventory Viewer cannot reach this
+       * edit workflow through normal UI access,
+       * and LaptopForm locks the price fields
+       * for that role.
+       *
+       * The backend must also enforce the
+       * Inventory Viewer restriction.
        */
-      if (
-        isSales
-      ) {
-        delete (
-          payload
-            .wholesale_price
-        );
-
-        delete (
-          payload
-            .retail_price
-        );
-      }
 
       const updatedLaptop =
         await updateLaptop(
@@ -309,10 +307,10 @@ function LaptopEditPage() {
           message={
             isNotFound
               ? (
-                  "The requested laptop record " +
-                  "does not exist or is no " +
-                  "longer available."
-                )
+                "The requested laptop record " +
+                "does not exist or is no " +
+                "longer available."
+              )
               : loadError.message
           }
         >
@@ -381,7 +379,7 @@ function LaptopEditPage() {
               serverFieldErrors
             }
             lockPrices={
-              isSales
+              isInventoryViewer
             }
           />
         </>
