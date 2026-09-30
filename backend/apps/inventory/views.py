@@ -158,13 +158,17 @@ class LaptopViewSet(viewsets.ModelViewSet):
 
     MAX_SYNCHRONOUS_EXPORT_ROWS = 25000
 
-    # Laptops currently in service are intentionally hidden
-    # from the normal inventory list. They are managed from
-    # Active Returns until service is completed.
-    queryset = Laptop.objects.exclude(
-        inventory_status=(
-            Laptop.InventoryStatus.IN_SERVICE
-        )
+    # Laptop Inventory contains only laptops that are
+    # currently available as inventory.
+    #
+    # - In Stock / In Stock G -> visible in Laptop Inventory
+    # - In Service -> managed from Active Returns
+    # - Sold -> removed from Laptop Inventory after sale
+    queryset = Laptop.objects.filter(
+        inventory_status__in=[
+            Laptop.InventoryStatus.IN_STOCK,
+            Laptop.InventoryStatus.IN_STOCK_G,
+        ]
     )
 
     serializer_class = LaptopSerializer
@@ -224,14 +228,19 @@ class LaptopViewSet(viewsets.ModelViewSet):
     ]
 
     def get_queryset(self):
-        # "In Service" is an internal workflow state, not a
-        # normal inventory bucket. Once a laptop is moved to
-        # service it disappears from Laptop Inventory and is
-        # managed from Active Returns until Done restores it.
-        queryset = Laptop.objects.exclude(
-            inventory_status=(
-                Laptop.InventoryStatus.IN_SERVICE
-            )
+        # Laptop Inventory must contain only laptops that are
+        # currently in stock. Sold laptops are intentionally
+        # excluded here so the API result and pagination count
+        # both represent the current inventory stock.
+        #
+        # In-service laptops remain hidden from this list and
+        # are managed from Active Returns until they are stocked
+        # back in.
+        queryset = Laptop.objects.filter(
+            inventory_status__in=[
+                Laptop.InventoryStatus.IN_STOCK,
+                Laptop.InventoryStatus.IN_STOCK_G,
+            ]
         )
 
         created_from = (
