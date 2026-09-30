@@ -3,8 +3,18 @@ import {
 } from "react-router-dom";
 
 import {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+
+import {
   useAuth,
 } from "../../auth/AuthContext.jsx";
+
+import {
+  getPendingOrders,
+} from "../../api/orderApi.js";
 
 
 function ApplicationSidebar({
@@ -43,9 +53,9 @@ function ApplicationSidebar({
     );
 
   const canViewDispatched =
-  hasPermission(
-    "inventory.view_order",
-  );
+    hasPermission(
+      "inventory.view_order",
+    );
 
   const canViewSales =
     !isInventoryViewer &&
@@ -59,6 +69,103 @@ function ApplicationSidebar({
   const canManageUsers =
     isAdmin ||
     isSales;
+
+  const [
+    pendingOrderCount,
+    setPendingOrderCount,
+  ] = useState(0);
+
+  const loadPendingOrderCount =
+    useCallback(
+      async () => {
+        if (!canViewOrders) {
+          setPendingOrderCount(0);
+          return;
+        }
+
+        try {
+          const data =
+            await getPendingOrders();
+
+          if (
+            Array.isArray(
+              data,
+            )
+          ) {
+            setPendingOrderCount(
+              data.length,
+            );
+            return;
+          }
+
+          setPendingOrderCount(
+            Number(
+              data?.count ?? 0,
+            ),
+          );
+        } catch {
+          // Keep the last known count when
+          // the sidebar refresh request fails.
+        }
+      },
+      [
+        canViewOrders,
+      ],
+    );
+
+  useEffect(() => {
+    if (!canViewOrders) {
+      setPendingOrderCount(0);
+      return undefined;
+    }
+
+    loadPendingOrderCount();
+
+    const refreshInterval =
+      window.setInterval(
+        loadPendingOrderCount,
+        10000,
+      );
+
+    const handleWindowFocus =
+      () => {
+        loadPendingOrderCount();
+      };
+
+    const handlePendingOrdersChanged =
+      () => {
+        loadPendingOrderCount();
+      };
+
+    window.addEventListener(
+      "focus",
+      handleWindowFocus,
+    );
+
+    window.addEventListener(
+      "pending-orders-changed",
+      handlePendingOrdersChanged,
+    );
+
+    return () => {
+      window.clearInterval(
+        refreshInterval,
+      );
+
+      window.removeEventListener(
+        "focus",
+        handleWindowFocus,
+      );
+
+      window.removeEventListener(
+        "pending-orders-changed",
+        handlePendingOrdersChanged,
+      );
+    };
+  }, [
+    canViewOrders,
+    loadPendingOrderCount,
+  ]);
 
 
   return (
@@ -96,7 +203,22 @@ function ApplicationSidebar({
               onNavigate
             }
           >
-            Pending Orders
+            <span className="sidebar-navigation-link-content">
+              <span>
+                Pending Orders
+              </span>
+
+              {pendingOrderCount > 0 ? (
+                <span
+                  className="pending-orders-nav-badge"
+                  aria-label={
+                    `${pendingOrderCount} pending orders`
+                  }
+                >
+                  {pendingOrderCount}
+                </span>
+              ) : null}
+            </span>
           </NavLink>
 
 

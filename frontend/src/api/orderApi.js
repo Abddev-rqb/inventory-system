@@ -1,6 +1,15 @@
 import axiosClient from "./axiosClient.js";
 
 
+function notifyPendingOrdersChanged() {
+  window.dispatchEvent(
+    new Event(
+      "pending-orders-changed",
+    ),
+  );
+}
+
+
 export async function createOrder(
   orderData,
 ) {
@@ -9,6 +18,8 @@ export async function createOrder(
       "/orders/",
       orderData,
     );
+
+  notifyPendingOrdersChanged();
 
   return response.data;
 }
@@ -37,6 +48,8 @@ export async function deletePendingOrder(
       `/orders/${orderId}/cancel/`,
     );
 
+  notifyPendingOrdersChanged();
+
   return response.data;
 }
 
@@ -49,6 +62,8 @@ export async function dispatchOrder(
       `/orders/${orderId}/dispatch/`,
       {},
     );
+
+  notifyPendingOrdersChanged();
 
   return response.data;
 }
@@ -66,6 +81,8 @@ export async function bulkDispatchOrders(
       },
     );
 
+  notifyPendingOrdersChanged();
+
   return response.data;
 }
 
@@ -82,29 +99,6 @@ export async function getDispatchedOrders(
     );
 
   return response.data;
-}
-
-export async function exportDispatchedOrders(
-  params = {},
-) {
-  const response =
-    await axiosClient.get(
-      "/orders/dispatched/export/",
-      {
-        params,
-
-        responseType:
-          "blob",
-      },
-    );
-
-  return {
-    blob:
-      response.data,
-
-    headers:
-      response.headers,
-  };
 }
 
 
@@ -197,6 +191,27 @@ export async function getSalesReport(
   return response.data;
 }
 
+export async function exportDispatchedOrders(
+  params = {},
+) {
+  const response =
+    await axiosClient.get(
+      "/orders/dispatched/export/",
+      {
+        params,
+        responseType:
+          "blob",
+      },
+    );
+
+  return {
+    blob:
+      response.data,
+
+    headers:
+      response.headers,
+  };
+}
 
 export async function exportSalesReport(
   params = {},
