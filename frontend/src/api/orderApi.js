@@ -102,6 +102,21 @@ export async function getDispatchedOrders(
 }
 
 
+export async function revertDispatchedOrder(
+  orderId,
+) {
+  const response =
+    await axiosClient.post(
+      `/orders/${orderId}/revert/`,
+      {},
+    );
+
+  notifyPendingOrdersChanged();
+
+  return response.data;
+}
+
+
 export async function requestOrderDeletion(
   orderId,
   reason,

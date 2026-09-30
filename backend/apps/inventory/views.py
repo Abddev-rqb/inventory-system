@@ -74,6 +74,9 @@ from apps.inventory.api_exceptions import (
 from apps.inventory.services.order_dispatch_service import (
     OrderDispatchService,
 )
+from apps.inventory.services.order_revert_service import (
+    OrderRevertService,
+)
 from apps.inventory.serializers import (
     OrderBulkDispatchSerializer,
     OrderCreateSerializer,
@@ -1128,6 +1131,55 @@ class OrderViewSet(
 
         return Response(
             serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="revert",
+    )
+    def revert_order(
+        self,
+        request,
+        pk=None,
+    ):
+        try:
+            order = (
+                OrderRevertService
+                .revert_order(
+                    order_id=pk,
+                    reverted_by=request.user,
+                )
+            )
+
+        except OrderValidationError as exc:
+            return Response(
+                {
+                    "detail": str(exc),
+                },
+                status=(
+                    status.HTTP_400_BAD_REQUEST
+                ),
+            )
+
+        serializer = (
+            OrderReadSerializer(
+                order,
+                context={
+                    "request": request,
+                },
+            )
+        )
+
+        return Response(
+            {
+                "message": (
+                    "Order reverted to pending "
+                    "successfully."
+                ),
+                "order": serializer.data,
+            },
             status=status.HTTP_200_OK,
         )
 

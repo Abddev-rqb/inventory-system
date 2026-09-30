@@ -112,6 +112,17 @@ class OrderPermission(
             )
 
         # ---------------------------------
+        # Revert dispatched order to pending
+        # ---------------------------------
+        if (
+            action
+            == "revert_order"
+        ):
+            return user.has_perm(
+                "inventory.change_order"
+            )
+
+        # ---------------------------------
         # Delete / cancel pending order
         #
         # Sales users already receive

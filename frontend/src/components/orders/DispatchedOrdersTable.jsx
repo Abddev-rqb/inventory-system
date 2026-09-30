@@ -2,11 +2,13 @@ function DispatchedOrdersTable({
   orders,
   isAdmin,
   canRequestDeletion,
+  canRevert = false,
   canViewTotalAmount = true,
   isProcessing,
   processingOrderId,
   onRequestDeletion,
   onDeleteOrder,
+  onRevertOrder,
 }) {
   return (
     <div className="table-scroll-container">
@@ -163,7 +165,69 @@ function DispatchedOrdersTable({
                   </td>
 
                   <td>
-                    {isAdmin ? (
+                    {canRevert ? (
+                      <div className="dispatched-order-actions">
+                        <button
+                          type="button"
+                          className="button button-secondary"
+                          disabled={
+                            isProcessing
+                          }
+                          onClick={() =>
+                            onRevertOrder(
+                              order,
+                            )
+                          }
+                        >
+                          {processing
+                            ? "Processing..."
+                            : "Revert"}
+                        </button>
+
+                        {isAdmin ? (
+                          <button
+                            type="button"
+                            className="button-link-danger"
+                            disabled={
+                              isProcessing
+                            }
+                            onClick={() =>
+                              onDeleteOrder(
+                                order,
+                              )
+                            }
+                          >
+                            Delete
+                          </button>
+                        ) : canRequestDeletion ? (
+                          <div className="dispatched-delete-action">
+                            <button
+                              type="button"
+                              className="button button-secondary"
+                              disabled={
+                                isProcessing ||
+                                !deletionEligibility.eligible
+                              }
+                              onClick={() =>
+                                onRequestDeletion(
+                                  order,
+                                )
+                              }
+                            >
+                              Request deletion
+                            </button>
+
+                            {!deletionEligibility.eligible ? (
+                              <small>
+                                {
+                                  deletionEligibility.message
+                                }
+                              </small>
+                            ) : null}
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : isAdmin ? (
                       <button
                         type="button"
                         className="button-link-danger"

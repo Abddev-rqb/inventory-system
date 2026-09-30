@@ -13,6 +13,7 @@ import {
   getOrderDeletionRequests,
   rejectOrderDeletionRequest,
   requestOrderDeletion,
+  revertDispatchedOrder,
 } from "../../api/orderApi.js";
 
 import {
@@ -191,6 +192,11 @@ function DispatchedOrdersPage() {
   const canRequestDeletion =
     hasPermission(
       "inventory.add_orderdeletionrequest",
+    );
+
+  const canRevert =
+    hasPermission(
+      "inventory.change_order",
     );
 
 
@@ -617,6 +623,89 @@ function DispatchedOrdersPage() {
           "for administrator review."
         ),
       );
+    } catch (error) {
+      const parsedError =
+        parseApiError(
+          error,
+        );
+
+      setActionError(
+        parsedError.message,
+      );
+    } finally {
+      setIsProcessing(
+        false,
+      );
+
+      setProcessingOrderId(
+        null,
+      );
+    }
+  }
+
+
+  async function handleRevertOrder(
+    order,
+  ) {
+    if (
+      !canRevert ||
+      !order ||
+      isProcessing
+    ) {
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        (
+          `Revert order ${order.order_number} ` +
+          "back to Pending Orders?\n\n" +
+          "The order will be removed from " +
+          "Dispatched Orders and its serialized " +
+          "laptops will be restored to their " +
+          "previous inventory status."
+        ),
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const orderId =
+      Number(
+        order.id,
+      );
+
+    setIsProcessing(
+      true,
+    );
+
+    setProcessingOrderId(
+      orderId,
+    );
+
+    setActionError(
+      null,
+    );
+
+    setSuccessMessage(
+      null,
+    );
+
+    try {
+      await revertDispatchedOrder(
+        orderId,
+      );
+
+      setSuccessMessage(
+        (
+          `${order.order_number} ` +
+          "was reverted to Pending Orders."
+        ),
+      );
+
+      await loadDispatchedOrders();
+
     } catch (error) {
       const parsedError =
         parseApiError(
@@ -1181,6 +1270,9 @@ function DispatchedOrdersPage() {
           canRequestDeletion={
             canRequestDeletion
           }
+          canRevert={
+            canRevert
+          }
           canViewTotalAmount={
             canViewTotalAmount
           }
@@ -1195,6 +1287,9 @@ function DispatchedOrdersPage() {
           }
           onDeleteOrder={
             handleDeleteOrder
+          }
+          onRevertOrder={
+            handleRevertOrder
           }
         />
       ) : null}
