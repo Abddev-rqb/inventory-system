@@ -417,7 +417,7 @@ function CommentCell({
     );
   }
 
-  const maxPreviewLength = 65;
+  const maxPreviewLength = 8;
 
   const isLongComment =
     normalizedComment.length >

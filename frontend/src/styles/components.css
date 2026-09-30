@@ -4847,6 +4847,74 @@ textarea {
 
 
 /* =========================================================
+   Laptop Inventory - Compact Comments
+   ========================================================= */
+
+.inventory-comments-column {
+  min-width: 125px;
+  width: 125px;
+  max-width: 125px;
+}
+
+.inventory-comments-cell {
+  width: 125px;
+  min-width: 125px;
+  max-width: 125px;
+  vertical-align: middle;
+}
+
+.inventory-comment-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-width: 0;
+}
+
+.inventory-comment-preview {
+  display: block;
+  min-width: 0;
+  max-width: 70px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inventory-comment-empty {
+  color: #98a2b3;
+}
+
+.inventory-comment-view-button {
+  flex-shrink: 0;
+
+  padding: 3px 6px;
+
+  border: 1px solid #d0d5dd;
+  border-radius: 5px;
+
+  background: #ffffff;
+  color: #344054;
+
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+
+  cursor: pointer;
+}
+
+.inventory-comment-view-button:hover {
+  background: #f2f4f7;
+  border-color: #98a2b3;
+}
+
+.inventory-comment-view-button:focus-visible {
+  outline: 2px solid #84adff;
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
    Laptop Inventory - Comment Modal
    ========================================================= */
 
