@@ -7,6 +7,8 @@ function ReturnsTable({
   canEdit,
   canAddExpense,
   canCompleteReturn,
+  canDeleteReturn,
+  deletingReturnId,
   completingReturnId,
   onSelectReturn,
   onAssignTechnician,
@@ -14,6 +16,7 @@ function ReturnsTable({
   onEdit,
   onExpense,
   onDone,
+  onDelete,
 }) {
   return (
     <div className="returns-table-section">
@@ -335,6 +338,28 @@ function ReturnsTable({
                             === returnRecord.id
                             ? "Moving..."
                             : "Done"}
+                        </button>
+                      ) : null}
+
+                      {canDeleteReturn ? (
+                        <button
+                          type="button"
+                          className="table-action-button"
+                          disabled={
+                            deletingReturnId
+                            !== null
+                          }
+                          title="Delete this return record"
+                          onClick={() =>
+                            onDelete(
+                              returnRecord,
+                            )
+                          }
+                        >
+                          {deletingReturnId
+                            === returnRecord.id
+                            ? "Deleting..."
+                            : "Delete"}
                         </button>
                       ) : null}
 

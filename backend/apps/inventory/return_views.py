@@ -5,6 +5,9 @@ from django.db.models import (
 from django.db import (
     transaction,
 )
+from django.db.models.deletion import (
+    ProtectedError,
+)
 from django.contrib.auth import (
     get_user_model,
 )
@@ -609,18 +612,40 @@ class ReturnViewSet(
         *args,
         **kwargs,
     ):
-        if (
-            get_user_role(
-                request.user
+        role = get_user_role(
+            request.user
+        )
+
+        if role not in {
+            ROLE_ADMIN,
+            ROLE_SALES,
+            ROLE_TECHNICIAN,
+        }:
+            return Response(
+                {
+                    "detail": (
+                        "Only Admin, Sales or "
+                        "Technician users can "
+                        "delete return records."
+                    ),
+                },
+                status=(
+                    status
+                    .HTTP_403_FORBIDDEN
+                ),
             )
-            != ROLE_ADMIN
+
+        if (
+            role != ROLE_ADMIN
+            and not request.user.has_perm(
+                "inventory.change_return"
+            )
         ):
             return Response(
                 {
                     "detail": (
-                        "Only Admin users "
-                        "can delete return "
-                        "records."
+                        "You do not have permission "
+                        "to delete return records."
                     ),
                 },
                 status=(
@@ -637,7 +662,22 @@ class ReturnViewSet(
             instance.pk
         )
 
-        instance.delete()
+        try:
+            instance.delete()
+        except ProtectedError:
+            return Response(
+                {
+                    "detail": (
+                        "This return cannot be deleted "
+                        "because it is already linked to "
+                        "a fulfillment order."
+                    ),
+                },
+                status=(
+                    status
+                    .HTTP_409_CONFLICT
+                ),
+            )
 
         return Response(
             {

@@ -198,6 +198,15 @@ export async function updateReturn(
   return response.data;
 }
 
+export async function deleteReturn(
+  returnId,
+) {
+  await axiosClient.delete(
+    `/returns/${returnId}/`,
+  );
+}
+
+
 export async function createReturnExpense(
   returnId,
   payload,

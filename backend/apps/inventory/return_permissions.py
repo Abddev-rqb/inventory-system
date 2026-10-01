@@ -191,13 +191,21 @@ class ReturnPermission(
                 ROLE_TECHNICIAN,
             }
 
-        # Returns cannot be deleted
-        # through this permission class.
+        # Delete a return record.
         if (
             action
             == "destroy"
         ):
-            return False
+            return (
+                role
+                in {
+                    ROLE_SALES,
+                    ROLE_TECHNICIAN,
+                }
+                and user.has_perm(
+                    "inventory.change_return"
+                )
+            )
 
         # Return Excel import remains
         # restricted to Sales users.

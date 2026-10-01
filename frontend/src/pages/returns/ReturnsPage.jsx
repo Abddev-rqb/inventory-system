@@ -13,6 +13,7 @@ import {
   completeReturnRepair,
   createReturn,
   createReturnExpense,
+  deleteReturn,
   exportReturns,
   exportReturnExpenses,
   exportStockedInReturns,
@@ -450,7 +451,7 @@ function ReturnsPage() {
     isEditing,
     setIsEditing,
   ] = useState(false);
-
+  
   const [
     completingReturnId,
     setCompletingReturnId,
@@ -466,6 +467,22 @@ function ReturnsPage() {
     doneActionReturn,
     setDoneActionReturn,
   ] = useState(null);
+
+  const [
+    deleteReturnRecord,
+    setDeleteReturnRecord,
+  ] = useState(null);
+
+  const [
+    deleteError,
+    setDeleteError,
+  ] = useState(null);
+
+  const [
+    deletingReturnId,
+    setDeletingReturnId,
+  ] = useState(null);
+
 
 
   const [
@@ -624,6 +641,17 @@ function ReturnsPage() {
     isSales
     ||
     isTechnician;
+
+
+  const canDeleteReturn =
+    isAdmin
+    ||
+    (
+      (isSales || isTechnician)
+      && hasPermission(
+        "inventory.change_return",
+      )
+    );
 
 
   const canExportReturns =
@@ -2612,6 +2640,96 @@ function ReturnsPage() {
   }
 
 
+  function handleOpenDelete(
+    returnRecord,
+  ) {
+    if (
+      !canDeleteReturn
+      || deletingReturnId !== null
+    ) {
+      return;
+    }
+
+    setDeleteError(null);
+    setDeleteReturnRecord(
+      returnRecord,
+    );
+  }
+
+
+  function handleCancelDelete() {
+    if (deletingReturnId !== null) {
+      return;
+    }
+
+    setDeleteReturnRecord(null);
+    setDeleteError(null);
+  }
+
+
+  async function handleConfirmDelete() {
+    if (
+      !deleteReturnRecord
+      || deletingReturnId !== null
+    ) {
+      return;
+    }
+
+    const returnId =
+      deleteReturnRecord.id;
+
+    setDeletingReturnId(
+      returnId,
+    );
+    setDeleteError(null);
+    setSuccessMessage(null);
+
+    try {
+      await deleteReturn(
+        returnId,
+      );
+
+      setDeleteReturnRecord(null);
+
+      if (
+        selectedReturn?.id
+        === returnId
+      ) {
+        setSelectedReturn(null);
+      }
+
+      setSuccessMessage(
+        "Return deleted successfully.",
+      );
+
+      if (
+        returns.length === 1
+        && page > 1
+      ) {
+        setPage(
+          page - 1,
+        );
+      } else {
+        await loadReturns();
+      }
+
+    } catch (error) {
+      const parsed =
+        parseApiError(
+          error,
+        );
+
+      setDeleteError(
+        parsed.message,
+      );
+    } finally {
+      setDeletingReturnId(
+        null,
+      );
+    }
+  }
+
+
 
   return (
     <section className="returns-page">
@@ -2994,6 +3112,12 @@ function ReturnsPage() {
                 canCompleteReturn={
                   canCompleteReturn
                 }
+                canDeleteReturn={
+                  canDeleteReturn
+                }
+                deletingReturnId={
+                  deletingReturnId
+                }
                 completingReturnId={
                   completingReturnId
                 }
@@ -3014,6 +3138,9 @@ function ReturnsPage() {
                 }
                 onDone={
                   handleOpenDoneAction
+                }
+                onDelete={
+                  handleOpenDelete
                 }
               />
 
@@ -3289,6 +3416,46 @@ function ReturnsPage() {
             }}
             onSubmit={
               handleExpenseSubmit
+            }
+          />
+
+
+          <ConfirmDialog
+            isOpen={
+              Boolean(
+                deleteReturnRecord,
+              )
+            }
+            title="Delete Return"
+            message={
+              deleteReturnRecord
+                ? (
+                    "Delete the return for "
+                    + deleteReturnRecord.customer_name
+                    + " ("
+                    + deleteReturnRecord.company
+                    + " "
+                    + deleteReturnRecord.model_number
+                    + ", serial "
+                    + deleteReturnRecord.serial_number
+                    + ")? This will permanently remove "
+                    + "the return record and its return "
+                    + "expense records."
+                  )
+                : ""
+            }
+            confirmLabel="Delete Return"
+            cancelLabel="Cancel"
+            processingLabel="Deleting..."
+            variant="danger"
+            isProcessing={
+              deletingReturnId !== null
+            }
+            onConfirm={
+              handleConfirmDelete
+            }
+            onCancel={
+              handleCancelDelete
             }
           />
 
