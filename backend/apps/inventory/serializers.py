@@ -1169,6 +1169,11 @@ class OrderSalesReadSerializer(
     items_text = (
         serializers.SerializerMethodField()
     )
+    
+    items = OrderItemReadSerializer(
+        many=True,
+        read_only=True,
+    )
 
     serial_numbers = (
         serializers.SerializerMethodField()
@@ -1192,6 +1197,7 @@ class OrderSalesReadSerializer(
             "customer_address",
 
             "items_text",
+            "items",
             "serial_numbers",
 
             "total_items",

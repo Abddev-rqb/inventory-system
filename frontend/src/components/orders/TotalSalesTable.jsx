@@ -91,7 +91,7 @@ function TotalSalesTable({
                 <td>
                   <ItemsCell
                     items={
-                      sale.items_text
+                      sale.items
                     }
                   />
                 </td>
@@ -170,10 +170,35 @@ function ItemsCell({
         ) => (
           <span
             key={
-              `${item}-${index}`
+              item.id ??
+              `${item.item_name}-${index}`
             }
           >
-            {item}
+            {displayValue(
+              item.item_name,
+            )}
+
+            {" — "}
+
+            {displayValue(
+              item.quantity,
+            )}
+
+            {" "}
+
+            {
+              Number(
+                item.quantity,
+              ) === 1
+                ? "pc"
+                : "pcs"
+            }
+
+            {" — "}
+
+            {formatMoney(
+              item.unit_price,
+            )}
           </span>
         ),
       )}

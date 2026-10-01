@@ -198,12 +198,9 @@ function PendingOrdersPage() {
     deletingOrderId !==
       null;
 
-  const isInventoryViewer =
-    user?.role ===
-    "inventory_viewer";
-
   const canViewTotalAmount =
-    !isInventoryViewer;
+    isAdmin ||
+    isSales;
 
 
   const loadPendingOrders =
