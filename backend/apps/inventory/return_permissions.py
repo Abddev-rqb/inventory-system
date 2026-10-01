@@ -48,6 +48,7 @@ class ReturnPermission(
             None,
         )
 
+        # View return records.
         if action in {
             "list",
             "retrieve",
@@ -58,51 +59,60 @@ class ReturnPermission(
                 ROLE_TECHNICIAN,
             }
 
+        # Add a new return.
         if (
             action
             == "create"
         ):
-            return (
-                role
-                == ROLE_SALES
-                and user.has_perm(
-                    "inventory.add_return"
-                )
-            )
+            return role in {
+                ROLE_SALES,
+                ROLE_TECHNICIAN,
+            }
 
+        # Edit a return.
         if action in {
             "update",
             "partial_update",
         }:
             return (
                 role
-                == ROLE_SALES
+                in {
+                    ROLE_SALES,
+                    ROLE_TECHNICIAN,
+                }
                 and user.has_perm(
                     "inventory.change_return"
                 )
             )
 
+        # Assign a technician.
         if (
             action
             == "assign_technician"
         ):
             return (
                 role
-                == ROLE_SALES
+                in {
+                    ROLE_SALES,
+                    ROLE_TECHNICIAN,
+                }
                 and user.has_perm(
                     "inventory.change_return"
                 )
             )
 
+        # Load technicians for the
+        # technician assignment dialog.
         if (
             action
             == "technicians"
         ):
-            return (
-                role
-                == ROLE_SALES
-            )
+            return role in {
+                ROLE_SALES,
+                ROLE_TECHNICIAN,
+            }
 
+        # Update return status.
         if (
             action
             == "update_status"
@@ -117,24 +127,34 @@ class ReturnPermission(
                     "inventory.change_return"
                 )
             )
-            
+
+        # Complete repair / Done action.
         if (
             action
             == "complete_repair"
         ):
             return (
-                role == ROLE_SALES
+                role
+                in {
+                    ROLE_SALES,
+                    ROLE_TECHNICIAN,
+                }
                 and user.has_perm(
                     "inventory.change_return"
                 )
             )
 
+        # Add return expense.
         if (
             action
             == "add_expense"
         ):
-            return role == ROLE_SALES
+            return role in {
+                ROLE_SALES,
+                ROLE_TECHNICIAN,
+            }
 
+        # View return expenses.
         if (
             action
             == "expenses"
@@ -145,33 +165,42 @@ class ReturnPermission(
                 ROLE_TECHNICIAN,
             }
 
+        # Stock in a returned laptop.
         if (
             action
             == "stock_in"
         ):
             return (
                 role
-                == ROLE_SALES
+                in {
+                    ROLE_SALES,
+                    ROLE_TECHNICIAN,
+                }
                 and user.has_perm(
                     "inventory.stock_in_return"
                 )
             )
 
+        # Assign return priority.
         if (
             action
             == "assign_priority"
         ):
-            return (
-                role
-                == ROLE_SALES
-            )
+            return role in {
+                ROLE_SALES,
+                ROLE_TECHNICIAN,
+            }
 
+        # Returns cannot be deleted
+        # through this permission class.
         if (
             action
             == "destroy"
         ):
             return False
-        
+
+        # Return Excel import remains
+        # restricted to Sales users.
         if action in {
             "import_preview",
             "import_confirm",
@@ -183,7 +212,8 @@ class ReturnPermission(
                     "inventory.add_return"
                 )
             )
-            
+
+        # View stocked-in return records.
         if (
             action
             == "stocked_in"
@@ -194,7 +224,7 @@ class ReturnPermission(
                 ROLE_TECHNICIAN,
             }
 
-
+        # Export stocked-in returns.
         if (
             action
             == "stocked_in_export"
@@ -210,6 +240,7 @@ class ReturnPermission(
                 )
             )
 
+        # Export active returns.
         if (
             action
             == "export_returns"
@@ -226,4 +257,3 @@ class ReturnPermission(
             )
 
         return False
-    

@@ -4,7 +4,6 @@ function ReturnsTable({
   canSelectPriority,
   canAssignTechnician,
   canUpdateStatus,
-  canStockIn,
   canEdit,
   canAddExpense,
   canCompleteReturn,
@@ -12,7 +11,6 @@ function ReturnsTable({
   onSelectReturn,
   onAssignTechnician,
   onUpdateStatus,
-  onStockIn,
   onEdit,
   onExpense,
   onDone,
@@ -302,33 +300,10 @@ function ReturnsTable({
                         &&
                         !canUpdateStatus(
                           returnRecord,
-                        )
-                        &&
-                        !canStockIn(
-                          returnRecord,
                         ) ? (
                         <span className="returns-actions-placeholder">
                           —
                         </span>
-                      ) : null}
-
-                      {canStockIn(
-                        returnRecord,
-                      ) ? (
-                        <button
-                          type="button"
-                          className={
-                            "table-action-button "
-                            + "return-stock-in-button"
-                          }
-                          onClick={() =>
-                            onStockIn(
-                              returnRecord,
-                            )
-                          }
-                        >
-                          Stock In
-                        </button>
                       ) : null}
 
                       {canCompleteReturn ? (

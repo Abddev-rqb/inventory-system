@@ -130,3 +130,118 @@ p {
   font-weight: 800;
   line-height: 1;
 }
+
+/* Done action dialog */
+.return-done-action-dialog {
+  width: min(420px, calc(100vw - 2rem));
+  max-width: 420px;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+}
+
+.return-done-action-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.return-done-action-card {
+  width: 100%;
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.return-done-action-header {
+  margin-bottom: 1rem;
+}
+
+.return-done-action-header h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #101828;
+}
+
+.return-done-action-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.return-done-radio-option {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  background: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.return-done-radio-option:hover {
+  background: #f9fafb;
+}
+
+.return-done-radio-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.return-done-radio-circle {
+  display: flex;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  border: 2px solid #98a2b3;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.return-done-radio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.return-done-radio-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.return-done-radio-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #101828;
+}
+
+.return-done-radio-description {
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: #667085;
+}
+
+.return-done-action-error {
+  margin-top: 0.85rem;
+  padding: 0.7rem;
+  border-radius: 6px;
+  background: #fef3f2;
+  color: #b42318;
+  font-size: 0.82rem;
+}
+
+.return-done-action-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}

@@ -71,6 +71,9 @@ import ConfirmDialog
 import ReturnStockInDialog
   from "../../components/returns/ReturnStockInDialog.jsx";
 
+import ReturnDoneActionDialog
+  from "../../components/returns/ReturnDoneActionDialog.jsx";
+
 import StockedInFilters
   from "../../components/returns/StockedInFilters.jsx";
 
@@ -460,6 +463,12 @@ function ReturnsPage() {
 
 
   const [
+    doneActionReturn,
+    setDoneActionReturn,
+  ] = useState(null);
+
+
+  const [
     expenseReturn,
     setExpenseReturn,
   ] = useState(null);
@@ -565,9 +574,11 @@ function ReturnsPage() {
 
 
   const canAddReturn =
-    hasPermission(
-      "inventory.add_return",
-    );
+    isAdmin
+    ||
+    isSales
+    ||
+    isTechnician;
 
   const showAssignPriority =
     !isInventoryViewer;
@@ -575,32 +586,44 @@ function ReturnsPage() {
   const canActuallyAssignPriority =
     isAdmin
     ||
-    isSales;
+    isSales
+    ||
+    isTechnician;
 
   const canAssignTechnician =
     isAdmin
     ||
-    isSales;
+    isSales
+    ||
+    isTechnician;
 
   const canImportReturns =
-    canAddReturn;
+    hasPermission(
+      "inventory.add_return",
+    );
 
   const canEditReturn =
     isAdmin
     ||
-    isSales;
+    isSales
+    ||
+    isTechnician;
 
 
   const canAddExpense =
     isAdmin
     ||
-    isSales;
+    isSales
+    ||
+    isTechnician;
 
 
   const canCompleteReturn =
     isAdmin
     ||
-    isSales;
+    isSales
+    ||
+    isTechnician;
 
 
   const canExportReturns =
@@ -612,7 +635,9 @@ function ReturnsPage() {
   const canPerformStockIn =
     isAdmin
     ||
-    isSales;
+    isSales
+    ||
+    isTechnician;
 
   const stockedInQueryParams =
     useMemo(
@@ -1262,29 +1287,13 @@ function ReturnsPage() {
   function canUpdateReturnStatus(
     returnRecord,
   ) {
-    if (
+    return (
       isAdmin
       ||
       isSales
-    ) {
-      return true;
-    }
-
-    if (
+      ||
       isTechnician
-    ) {
-      return (
-        Number(
-          returnRecord
-            .technician,
-        )
-        === Number(
-          user?.id,
-        )
-      );
-    }
-
-    return false;
+    );
   }
 
 
@@ -1378,7 +1387,7 @@ function ReturnsPage() {
   }
 
 
-  async function handleDoneReturn(
+  function handleOpenDoneAction(
     returnRecord,
   ) {
     if (
@@ -1391,9 +1400,34 @@ function ReturnsPage() {
       return;
     }
 
-    setCompletingReturnId(
-      returnRecord.id,
-    );
+    setDoneError(null);
+    setSuccessMessage(null);
+    setDoneActionReturn(returnRecord);
+  }
+
+
+  function handleCloseDoneAction() {
+    if (completingReturnId !== null) {
+      return;
+    }
+
+    setDoneActionReturn(null);
+    setDoneError(null);
+  }
+
+
+  async function handleMoveToPendingOrders() {
+    if (
+      !doneActionReturn
+      || completingReturnId !== null
+    ) {
+      return;
+    }
+
+    const returnRecord = doneActionReturn;
+
+    setDoneActionReturn(null);
+    setCompletingReturnId(returnRecord.id);
     setDoneError(null);
     setSuccessMessage(null);
 
@@ -1436,6 +1470,18 @@ function ReturnsPage() {
     } finally {
       setCompletingReturnId(null);
     }
+  }
+
+
+  function handleDoneStockIn() {
+    if (!doneActionReturn) {
+      return;
+    }
+
+    const returnRecord = doneActionReturn;
+
+    setDoneActionReturn(null);
+    handleOpenStockIn(returnRecord);
   }
 
   function handleOpenTechnician(
@@ -1575,8 +1621,13 @@ function ReturnsPage() {
     return (
       canPerformStockIn
       &&
-      returnRecord.status
-        === "swap_requested"
+      (
+        returnRecord.status
+          === "swap_requested"
+        ||
+        returnRecord.status
+          === "repair_completed"
+      )
       &&
       !returnRecord
         .stocked_in_laptop
@@ -2934,9 +2985,6 @@ function ReturnsPage() {
                 canUpdateStatus={
                   canUpdateReturnStatus
                 }
-                canStockIn={
-                  canStockInReturn
-                }
                 canEdit={
                   canEditReturn
                 }
@@ -2958,9 +3006,6 @@ function ReturnsPage() {
                 onUpdateStatus={
                   handleOpenStatus
                 }
-                onStockIn={
-                  handleOpenStockIn
-                }
                 onEdit={
                   handleOpenEdit
                 }
@@ -2968,7 +3013,7 @@ function ReturnsPage() {
                   handleOpenExpense
                 }
                 onDone={
-                  handleDoneReturn
+                  handleOpenDoneAction
                 }
               />
 
@@ -3132,6 +3177,31 @@ function ReturnsPage() {
               handleStatusSubmit
             }
           />
+
+          <ReturnDoneActionDialog
+            isOpen={
+              Boolean(doneActionReturn)
+            }
+            returnRecord={
+              doneActionReturn
+            }
+            isProcessing={
+              completingReturnId !== null
+            }
+            errorMessage={
+              doneError
+            }
+            onClose={
+              handleCloseDoneAction
+            }
+            onMoveToPending={
+              handleMoveToPendingOrders
+            }
+            onStockIn={
+              handleDoneStockIn
+            }
+          />
+
 
           <ReturnStockInDialog
             isOpen={

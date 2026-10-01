@@ -44,13 +44,16 @@ class ReturnStockInService:
 
         if (
             return_record.status
-            != Return.Status.SWAP_REQUESTED
+            not in {
+                Return.Status.SWAP_REQUESTED,
+                Return.Status.REPAIR_COMPLETED,
+            }
         ):
             raise ReturnStockInError(
                 (
                     "Only a return with "
-                    "Swap Requested status "
-                    "can be stocked in."
+                    "Swap Requested or Repair Completed "
+                    "status can be stocked in."
                 )
             )
 

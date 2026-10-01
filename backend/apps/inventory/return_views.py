@@ -549,13 +549,14 @@ class ReturnViewSet(
         if role not in {
             ROLE_ADMIN,
             ROLE_SALES,
+            ROLE_TECHNICIAN,
         }:
             return Response(
                 {
                     "detail": (
-                        "Only Admin or Sales "
-                        "users can assign "
-                        "return priority."
+                        "Only Admin, Sales or "
+                        "Technician users can "
+                        "assign return priority."
                     )
                 },
                 status=(
